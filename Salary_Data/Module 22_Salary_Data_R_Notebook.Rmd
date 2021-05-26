@@ -1,0 +1,91 @@
+# Naive Bayes
+
+### Problem Statement:- To Predict Salary level of customers. 
+
+```{r}
+# Loading the Train Dataset
+salary_train <- read.csv("~/desktop/Digi 360/Module 22/Datasets-6/SalaryData_Train.csv")
+head(salary_train)
+```
+```{r}
+table(salary_train$Salary)
+```
+```{r}
+salary_train$Salary <- ifelse(salary_train$Salary == ' <=50K', "Low", "High")
+head(salary_train)
+```
+
+```{r}
+table(salary_train$Salary)
+```
+
+The problem here is that the variable “Salary” in the char data type, which is a problem. As there are only two levels in this variable, high and low, hence we have to convert it into factor data type.
+
+```{r}
+salary_train$Salary <- as.factor(salary_train$Salary)
+head(salary_train)
+```
+
+```{r}
+# Loading required libraries
+library(e1071)
+library(caret)
+```
+
+### Building the Model
+
+```{r}
+salary_nb <- naiveBayes(Salary ~ . , data = salary_train)
+salary_nb
+```
+
+Under the heading “A-priori probabilities”, we see that there is 25% chance of income of the testing dataset customers being high. Similarly 575% chance of income of the testing dataset customers being low.
+
+Next, if the Education is “Bachelors”, the probability of the income being high is more than the probability of the income is low Compared to “Masters”, the probability of the income being high is much more than the probability of the income is low, which is logical.
+
+We read the rest in this manner.
+
+```{r}
+# Loading the Test Dataset
+salary_test <- read.csv("~/desktop/Digi 360/Module 22/Datasets-6/SalaryData_Test.csv")
+head(salary_test)
+```
+
+```{r}
+salary_test$Salary <- ifelse(salary_test$Salary == ' <=50K', "Low", "High")
+head(salary_test)
+```
+
+```{r}
+table(salary_test$Salary)
+```
+```{r}
+salary_test$Salary <- as.factor(salary_test$Salary)
+head(salary_test)
+```
+
+### Predicting on Test Data
+
+```{r}
+pred_nb <- predict(salary_nb, salary_test)
+```
+
+The variable “pred_nb” stores the high and low levels corresponding to all the records. To read it properly let’s create a confusion matrix out of it.
+
+
+### Confusion Matrix
+
+```{r}
+confusionMatrix(table(pred_nb, salary_test$Salary))
+```
+
+
+### Validation Observations
+
+The diagonal values are the number of correct predictions and the off-diagonals are considered a number of wrong predictions. So we see that there are much lower wrong predictions as compared to the correct predictions.
+
+Accuracy per cent is much high (82%) which is a good indication.
+
+P-value is much lower than 0.05 (<2.2e-16), which is desired.
+
+Hence with all these observations, we can say it is a good model.
